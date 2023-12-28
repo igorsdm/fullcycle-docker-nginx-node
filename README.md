@@ -1,4 +1,4 @@
-# fullcycle-docker-nginx-node
+# Desafio Docker - Nginx com Node e Mysql
 
 ## Rodar imagem do docker-hub
 
