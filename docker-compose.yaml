@@ -1,0 +1,51 @@
+version: "3"
+
+services:
+  nginx:
+    build:
+      context: nginx
+    container_name: nginx
+    networks:
+      - node-network
+    ports:
+      - "8080:80"
+    depends_on:
+      node:
+        condition: service_started
+    healthcheck:
+      test: curl --fail http://nginx:8080/ || exit 1
+  node:
+    build:
+      context: node
+    container_name: node
+    networks:
+      - node-network
+    tty: true
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: curl --fail http://node:3000/ || exit 1
+  db:
+    image: mysql:5.7
+    command: --innodb-use-native-aio=0
+    container_name: db
+    restart: always
+    tty: true
+    volumes:
+      - ./mysql:/var/lib/mysql
+      - ./data:/docker-entrypoint-initdb.d
+    environment:
+      - MYSQL_DATABASE=nodedb
+      - MYSQL_ROOT_PASSWORD=root
+    networks:
+      - node-network
+    healthcheck:
+      test: mysqladmin ping -P 3306 -proot | grep 'mysqld is alive' || exit 1
+      interval: 5s
+      timeout: 3s
+      retries: 2
+      start_period: 0s
+networks:
+  node-network:
+    driver: bridge
