@@ -27,13 +27,6 @@ app.get("/", (_, res) => {
   connection.query(`SELECT name FROM people`, (error, results, fields) => {
     res.send(`
     <h1>Full Cycle Rocks!</h1>
-    ${
-      !!results
-        ? `<ol>
-        ${results.map((result) => `<li>${result.name}</li>`).join("")}
-        </ol>`
-        : "</>"
-    }
     `);
   });
 });
